@@ -2,27 +2,38 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('./database');
 
+// This is the main scrapper function that will scrap data from the crunchbase website
+
 const config = {
     method: 'get',
     headers: {
         // 'Accept-Encoding': 'gzip, deflate, br',
-        // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-        'User-Agent': 'PostmanRuntime/7.29.4',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        // 'User-Agent': 'PostmanRuntime/7.29.4',
         // 'Access-Control-Allow-Origin': '*'
     }
 }
 
+// This function scrapes data from the website
 async function dataScrapper(organization) {
     try {
-        console.log(organization);
+        // console.log(organization);
+
+        // Calling the modified string function to modify the string
         let org = await modifyString(organization);
+
+        // Getting the HTTPS response
         const orgResponse = await axios.get(`https://www.crunchbase.com/organization/${org}`, config);
+
+        // Loading the HTML from HTTPS response data
         let $ = cheerio.load(orgResponse.data);
 
+        // Extracting the Organization Title
         const orgTitle = $('.profile-name').text().trim();
 
-        console.log(orgTitle);
+        // console.log(orgTitle);
 
+        // Extracting the individuals' data
         const empResponse = await axios.get(`https://www.crunchbase.com/organization/${org}/people`, config);
         $ = cheerio.load(empResponse.data);
 
@@ -40,6 +51,7 @@ async function dataScrapper(organization) {
             });
         });
 
+        // Extracting the funding data
         const finResponse = await axios.get(`https://www.crunchbase.com/organization/${org}/company_financials`, config);
         $ = cheerio.load(finResponse.data);
 
@@ -66,9 +78,12 @@ async function dataScrapper(organization) {
 
         });
 
+        // Performing database operations
         await db.insertOrganization(orgTitle);
 
         let orgId;
+
+        // Getting the orgId as a promise
         await db.getOrganizationId(orgTitle)
             .then((id) => {
                 console.log(id);
@@ -86,8 +101,9 @@ async function dataScrapper(organization) {
             db.insertFundingDetails(orgId, element.date, element.transaction, element.amount, element.numOfInvestors, element.leadInvestor);
         });
 
-        console.log(individuals);
-        console.log(fundingRounds);
+        // To check data in the console
+        // console.log(individuals);
+        // console.log(fundingRounds);
 
         return [];
 
@@ -97,11 +113,13 @@ async function dataScrapper(organization) {
     }
 }
 
+// This function modifies the Organization Name to be passed on to the URL
 async function modifyString(string) {
     try {
         let modifiedString = string.toLowerCase();
         modifiedString = modifiedString.split(' ').join('-');
-        console.log(modifiedString);
+        // It basically transforms the name - Perplexity AI to perplexity-ai
+        // console.log(modifiedString);
         return modifiedString;
     } catch (error) {
         console.log(error);

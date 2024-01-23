@@ -5,7 +5,7 @@ exports.getRouterController = async (req, res, next) => {
         const org = req.body.org;
         // console.log(req.body);
         let scrap = await scrapper(org);
-        console.log(scrap);
+        // console.log(scrap);
         return res.status(200).json({
             status: "ok",
             data: scrap?.list,
