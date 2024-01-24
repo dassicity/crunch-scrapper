@@ -63,7 +63,7 @@ function getOrganizationId(orgName) {
                 reject(err);
             } else {
                 // Return the organization_id (or null if not found)
-                console.log(row.id);
+                // console.log(row.id);
                 resolve(row ? row.id : null);
             }
         });

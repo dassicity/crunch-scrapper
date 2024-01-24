@@ -8,16 +8,16 @@ const config = {
     method: 'get',
     headers: {
         // 'Accept-Encoding': 'gzip, deflate, br',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36',
         // 'User-Agent': 'PostmanRuntime/7.29.4',
         // 'Access-Control-Allow-Origin': '*'
-    }
+    },
 }
 
 // This function scrapes data from the website
 async function dataScrapper(organization) {
     try {
-        // console.log(organization);
+        // console.log(`Organization - ${organization}`);
 
         // Calling the modified string function to modify the string
         let org = await modifyString(organization);
@@ -31,7 +31,7 @@ async function dataScrapper(organization) {
         // Extracting the Organization Title
         const orgTitle = $('.profile-name').text().trim();
 
-        // console.log(orgTitle);
+        console.log(`OrgTitle - ${orgTitle}`);
 
         // Extracting the individuals' data
         const empResponse = await axios.get(`https://www.crunchbase.com/organization/${org}/people`, config);
@@ -86,12 +86,12 @@ async function dataScrapper(organization) {
         // Getting the orgId as a promise
         await db.getOrganizationId(orgTitle)
             .then((id) => {
-                console.log(id);
+                // console.log(id);
                 orgId = id;
             })
             .catch(err => console.log(err));
 
-        console.log(orgId);
+        // console.log(orgId);
 
         await individuals.forEach((element) => {
             db.insertIndividual(orgId, element.name, element.link, element.position);
@@ -105,10 +105,10 @@ async function dataScrapper(organization) {
         // console.log(individuals);
         // console.log(fundingRounds);
 
-        return [];
+        return `${org} done`;
 
     } catch (error) {
-        console.log(error);
+        console.log(error.response);
         return null;
     }
 }
