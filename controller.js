@@ -1,4 +1,4 @@
-const scrapper = require('./scrapper').dataScrapper;
+const scrapper = require('./scraper').dataScrapper;
 const axios = require("axios");
 
 exports.getRouterController = async (req, res, next) => {
@@ -18,7 +18,7 @@ exports.getRouterController = async (req, res, next) => {
             "query": [
 
             ],
-            "limit": 100,
+            "limit": 10,
 
         }
 
@@ -36,14 +36,14 @@ exports.getRouterController = async (req, res, next) => {
 
         // const org = req.body.org;
         // console.log(req.body);
-        const response = await axios.post('https://api.crunchbase.com/api/v4/searches/organizations?user_key=aa1b25ca88ec78aff0cde45f712557ab', body, config);
+        // const response = await axios.post('https://api.crunchbase.com/api/v4/searches/organizations?user_key=aa1b25ca88ec78aff0cde45f712557ab', body, config);
         let scrape;
 
-        await response.data.entities.forEach(async (element) => {
-            const name = element.properties.identifier.permalink;
-            console.log(`Name - ${name}`);
-            scrape = await scrapper(name);
-        });
+        // await response.data.entities.forEach(async (element) => {
+        //     const name = element.properties.identifier.permalink;
+        //     console.log(`Name - ${name}`);
+        // });
+        scrape = await scrapper('nvidia');
 
         console.log(`Scrape - ${scrape}`);
         return res.status(200).json({

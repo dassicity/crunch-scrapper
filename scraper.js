@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('./database');
+// const data = require('./Untitled-2.html')
 
 // This is the main scrapper function that will scrap data from the crunchbase website
 
@@ -8,16 +9,27 @@ const config = {
     method: 'get',
     headers: {
         // 'Accept-Encoding': 'gzip, deflate, br',
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36',
+        // 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36',
+        // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.4',
         // 'User-Agent': 'PostmanRuntime/7.29.4',
         // 'Access-Control-Allow-Origin': '*'
     },
+    // proxy: {
+    //     protocol: 'http',
+    //     host: '103.216.48.118',
+    //     port: 8080,
+    //     // auth: {
+    //     //   username: 'mikeymike',
+    //     //   password: 'rapunz3l'
+    //     // }
+    // },
 }
 
 // This function scrapes data from the website
 async function dataScrapper(organization) {
     try {
-        // console.log(`Organization - ${organization}`);
+        console.log(`Organization - ${organization}`);
 
         // Calling the modified string function to modify the string
         let org = await modifyString(organization);
@@ -55,8 +67,12 @@ async function dataScrapper(organization) {
         const finResponse = await axios.get(`https://www.crunchbase.com/organization/${org}/company_financials`, config);
         $ = cheerio.load(finResponse.data);
 
-        $('tbody tr').each((index, element) => {
+        $('span#funding_rounds').find('tbody tr').each((index, element) => {
             let date, transaction, numOfInvestors, amount, leadInvestor;
+
+            console.log("Funding element - ");
+            console.log(index);
+            console.log($(element).text());
 
             if ($(element).text().trim() !== "") {
                 date = $(element).find('.field-type-date').text().trim();
@@ -108,7 +124,7 @@ async function dataScrapper(organization) {
         return `${org} done`;
 
     } catch (error) {
-        console.log(error.response);
+        console.log(error);
         return null;
     }
 }
