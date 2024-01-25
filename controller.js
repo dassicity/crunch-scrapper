@@ -36,14 +36,14 @@ exports.getRouterController = async (req, res, next) => {
 
         // const org = req.body.org;
         // console.log(req.body);
-        // const response = await axios.post('https://api.crunchbase.com/api/v4/searches/organizations?user_key=aa1b25ca88ec78aff0cde45f712557ab', body, config);
+        const response = await axios.post('https://api.crunchbase.com/api/v4/searches/organizations?user_key=aa1b25ca88ec78aff0cde45f712557ab', body, config);
         let scrape;
 
-        // await response.data.entities.forEach(async (element) => {
-        //     const name = element.properties.identifier.permalink;
-        //     console.log(`Name - ${name}`);
-        // });
-        scrape = await scrapper('nvidia');
+        await response.data.entities.forEach(async (element) => {
+            const name = element.properties.identifier.permalink;
+            scrape = await scrapper('nvidia');
+            console.log(`Name - ${name}`);
+        });
 
         console.log(`Scrape - ${scrape}`);
         return res.status(200).json({
